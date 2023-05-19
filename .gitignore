@@ -1,0 +1,6 @@
+wavs/
+*.wav
+__pycache__
+# *.json
+*.pth
+*.pt
