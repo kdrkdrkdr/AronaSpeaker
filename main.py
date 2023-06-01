@@ -1,21 +1,19 @@
 import io
-import os
 import speech_recognition as sr
-import whisper
-import torch
+from faster_whisper import WhisperModel
 
 from datetime import datetime, timedelta
 from queue import Queue
 from tempfile import NamedTemporaryFile
 from time import sleep
 
-from llm import AnswerChatGPT, AnswerBard
+from llm import LLM
 from tts import tts_arona
-import shutil
+from papagopy import Papagopy
 
+p = Papagopy()
 
-
-start_word = ['アロナ', 'アロンア', 'アロンあ', 'あるな', 'アルナ', '아로나', '아론아', '아르나', 'Arona', 'arona']
+start_word = ['アロナ', 'アロンア', 'アロンあ', 'あるな', 'アルナ', '아로나', '아론아', '아르나', '아레나', 'Arona', 'arona']
 
 
 def isStartWordCalled(string: str):
@@ -40,7 +38,11 @@ def stt_arona():
     recorder.dynamic_energy_threshold = False
     
     source = sr.Microphone(sample_rate=16000)
-    audio_model = whisper.load_model("medium", download_root='pretrained_model/whisper/')
+    audio_model = WhisperModel(
+        model_size_or_path='large-v2',
+        device='cuda',
+        compute_type='float16',
+    )
 
     temp_file = NamedTemporaryFile().name
     transcription = ['']
@@ -79,14 +81,18 @@ def stt_arona():
                 with open(temp_file, 'w+b') as f:
                     f.write(wav_data.read())
 
-                result = audio_model.transcribe(
+                segments, info = audio_model.transcribe(
                     temp_file,
-                    fp16=torch.cuda.is_available(),
-                    # language="Japanese",
+                    vad_filter=True,
+                    vad_parameters=dict(
+                        min_silence_duration_ms=500
+                    ),
                 )
-                text = result['text'].strip()
+                text = ' '.join([s.text for s in segments]).strip()
+                language = info.language
+
                 print(f'isCalledArona={isCalledArona}',)
-                if (result['language'] == 'nn') or (not text):
+                if not text:
                     continue
 
                 if phrase_complete:
@@ -94,18 +100,24 @@ def stt_arona():
                 else:
                     transcription[-1] = text
                     
-                print(text)
+                print(f"text = '{text}'")
                 
                 if transcription != '':
-                    if isCalledArona:
-                        msg = AnswerBard(transcription[-1])
+                    if isCalledArona: # if True 로 바꾸고 if isStartWordCalled 부분 주석처리하면 그냥 아로나와 대화하는 것.
+                        msg = LLM(transcription[-1])
+                        
+                        if language != 'ja':
+                            msg = p.translate(msg, 'ja')
+                            
+                        print(msg)
                         tts_arona(msg)
+                        print("아로나가 대답을 모두 했어요!")
                         isCalledArona = False
                         continue
                     
                     if isStartWordCalled(transcription[-1]):
                         tts_arona("はい、先生")
-                        sleep(0.25)
+                        # sleep(0.25)
                         isCalledArona = True
                         print("아로나를 호출했어요! 지금 질문하세요!")
                         continue
