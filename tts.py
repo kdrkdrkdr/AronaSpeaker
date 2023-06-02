@@ -1,10 +1,10 @@
 import re
 import torch
-import commons
-import utils
-from models import SynthesizerTrn
-from text.symbols import symbols
-from text import text_to_sequence
+from vits import commons
+from vits import utils
+from vits.models import SynthesizerTrn
+from vits.text.symbols import symbols
+from vits.text import text_to_sequence
 
 from scipy.io.wavfile import write
 import winsound
@@ -31,13 +31,13 @@ _ = net_g.eval()
 
 _ = utils.load_checkpoint(f"pretrained_model/vits/arona_vits.pth", net_g, None)
 
-speed = 1
+SPEED = 1
 
 def tts_arona(text):
     stn_tst = get_text(text, hps)
     with torch.no_grad():
         x_tst = stn_tst.cuda().unsqueeze(0)
         x_tst_lengths = torch.LongTensor([stn_tst.size(0)]).cuda()
-        audio = net_g.infer(x_tst, x_tst_lengths, noise_scale=.667, noise_scale_w=0.8, length_scale=1/speed)[0][0,0].data.cpu().float().numpy()
+        audio = net_g.infer(x_tst, x_tst_lengths, noise_scale=.667, noise_scale_w=0.8, length_scale=1/SPEED)[0][0,0].data.cpu().float().numpy()
     write('infer.wav', hps.data.sampling_rate, audio)
     winsound.PlaySound('infer.wav', winsound.SND_FILENAME)

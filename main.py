@@ -9,11 +9,12 @@ from time import sleep
 
 from llm import LLM
 from tts import tts_arona
+
 from papagopy import Papagopy
 
 p = Papagopy()
 
-start_word = ['アロナ', 'アロンア', 'アロンあ', 'あるな', 'アルナ', '아로나', '아론아', '아르나', '아레나', 'Arona', 'arona']
+start_word = ['アロナ', 'アロンア', 'アロンあ', 'あるな', 'アルナ', '아로나', '아론아', '아르나', '아레나', '아루나', 'Arona', 'arona']
 
 
 def isStartWordCalled(string: str):
