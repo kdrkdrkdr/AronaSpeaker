@@ -64,6 +64,7 @@ def tts_arona(content: str):
                 write('sound/infer.wav', hps.data.sampling_rate, audio)
                 winsound.PlaySound('sound/infer.wav', winsound.SND_FILENAME)
 
+tts_arona("")
 # tts_arona("はい、先生")
 # tts_arona(open('test.txt', 'r', encoding='utf-8').read())
 # arona_ms_istft_vits.pth
