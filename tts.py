@@ -54,7 +54,7 @@ def tts_arona(content: str):
 
     sent_lst = sengiri.tokenize(content)
     for text in [' '.join(s) for s in list_chunk(lst=sent_lst, n=len(sent_lst))]: # n문장씩 끊어서 추론할거임. (너무 긴 문장을 한번에 합성하면 GPU 너무 잡아먹는다.)
-        if text.replace('。', ''):
+        if text.replace('。', '').replace(' ', ''):
             print('아로나 Speech: ', text)
             stn_tst = get_text(text, hps)
             with torch.no_grad():
@@ -64,7 +64,6 @@ def tts_arona(content: str):
                 write('sound/infer.wav', hps.data.sampling_rate, audio)
                 winsound.PlaySound('sound/infer.wav', winsound.SND_FILENAME)
 
-tts_arona("")
 # tts_arona("はい、先生")
 # tts_arona(open('test.txt', 'r', encoding='utf-8').read())
 # arona_ms_istft_vits.pth
