@@ -12,12 +12,21 @@ from tts import tts_arona
 
 from papagopy import Papagopy
 
+import neologdn
+import jaconv
+import winsound
+
+
+
 p = Papagopy()
 
-start_word = ['アロナ', 'アロンア', 'アロンあ', 'あるな', 'アルナ', '아로나', '아론아', '아르나', '아레나', '아루나', 'Arona', 'arona']
+start_word = ['アロナ', 'アロンア', 'アロンァ', 'アルナ', 'アルナァ' , '아로나', '아론아', '아르나', '아루나', 'arona']
 
 
 def isStartWordCalled(string: str):
+    string = neologdn.normalize(string).lower()
+    string = jaconv.hira2kata(string)
+    # 특수문자같은거 그냥 날려버리는게 좋다. 어떤 텍스트가 오던 마지막에 아로나로 인식하면 됨.
     string = string.replace('.', '').replace('?', '').replace('!', '').replace(' ', '')
     for sw in start_word:
         if string[-len(sw):] == sw:
@@ -25,10 +34,10 @@ def isStartWordCalled(string: str):
     return False
 
 
-
-def stt_arona():
-    energy_threshold = 1000
-    record_timeout = 2
+#TODO: 아로나가 말하고 있을 때는 녹음이 되지 않도록 해야함.
+if __name__ == "__main__":
+    energy_threshold = 13000
+    record_timeout = 4
     phrase_timeout = 3
     
     phrase_time = None
@@ -40,10 +49,11 @@ def stt_arona():
     
     source = sr.Microphone(sample_rate=16000)
     audio_model = WhisperModel(
-        model_size_or_path='large-v2',
+        model_size_or_path='large-v2', # large-v2
         device='cuda',
         compute_type='float16',
     )
+    tts_arona("。シッディムの箱。稼動します。")
 
     temp_file = NamedTemporaryFile().name
     transcription = ['']
@@ -56,8 +66,6 @@ def stt_arona():
         data_queue.put(data)
 
     recorder.listen_in_background(source, record_callback, phrase_time_limit=record_timeout)
-
-    print("Whisper Model Loaded!\n")
 
     isCalledArona = False
 
@@ -100,25 +108,27 @@ def stt_arona():
                     transcription.append(text)
                 else:
                     transcription[-1] = text
+
                     
                 print(f"text = '{text}'")
                 
-                if transcription != '':
-                    if isCalledArona: # if True 로 바꾸고 if isStartWordCalled 부분 주석처리하면 그냥 아로나와 대화하는 것.
+                if text != '':
+                    if isCalledArona: # if True 로 바꾸고 if isStartWordCalled 부분 주석처리하면 그냥 아로나와 대화하는 것. 
                         msg = LLM(transcription[-1])
                         
-                        if language != 'ja':
-                            msg = p.translate(msg, 'ja')
+                        # if language != 'ja':
+                        msg = p.translate(msg, 'ja')
                             
                         print(msg)
                         tts_arona(msg)
-                        print("아로나가 대답을 모두 했어요!")
+                        print("아로나가 대답을 완료했어요!")
+                        sleep(0.5)
                         isCalledArona = False
                         continue
                     
-                    if isStartWordCalled(transcription[-1]):
-                        tts_arona("はい、先生")
-                        # sleep(0.25)
+                    if isStartWordCalled(text):
+                        winsound.PlaySound('sound/hi_sensei.wav', winsound.SND_FILENAME)
+                        sleep(0.5)
                         isCalledArona = True
                         print("아로나를 호출했어요! 지금 질문하세요!")
                         continue
@@ -128,8 +138,3 @@ def stt_arona():
         except KeyboardInterrupt:
             break
 
-
-    
-
-if __name__ == "__main__":
-    stt_arona()

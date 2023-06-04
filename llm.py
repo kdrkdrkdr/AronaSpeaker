@@ -40,7 +40,7 @@ def AnswerBard(user_input):
     while True:
         try:
             bard = Bard()
-            return bard.get_answer(user_input)['content']
+            return bard.get_answer(user_input)['content'].replace('あなた', '先生')
 
         except Exception as e:
             print(e)
