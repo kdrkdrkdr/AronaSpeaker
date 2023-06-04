@@ -30,7 +30,7 @@ def get_text(text, hps):
     return text_norm
 
 
-hps = utils.get_hparams_from_file(f"pretrained_model/vits/arona_{tts_model}_config.json")
+hps = utils.get_hparams_from_file(f"pretrained_model/arona_{tts_model}_config.json")
 net_g = SynthesizerTrn(
     len(symbols),
     hps.data.filter_length // 2 + 1,
@@ -39,7 +39,7 @@ net_g = SynthesizerTrn(
     **hps.model).cuda()
 _ = net_g.eval()
 
-_ = utils.load_checkpoint(f"pretrained_model/vits/arona_{tts_model}.pth", net_g, None)
+_ = utils.load_checkpoint(f"pretrained_model/arona_{tts_model}.pth", net_g, None)
 
 
 def list_chunk(lst, n):
