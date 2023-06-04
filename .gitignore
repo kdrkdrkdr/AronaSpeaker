@@ -1,5 +1,5 @@
-wavs/
-*.wav
+# wavs/
+# *.wav
 __pycache__
 # *.json
 *.pth
