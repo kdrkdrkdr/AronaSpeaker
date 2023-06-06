@@ -20,7 +20,18 @@ import winsound
 
 p = Papagopy()
 
-start_word = ['アロナ', 'アロンア', 'アロンァ', 'アルナ', 'アルナァ' , '아로나', '아론아', '아르나', '아루나', 'arona']
+start_word = [
+    'アロナ', 
+    'アロンア', 
+    'アロンァ', 
+    'アルナ', 
+    'アルナァ', 
+    '아로나', 
+    '아론아', 
+    '아르나', 
+    '아루나', 
+    'arona'
+]
 
 
 def isStartWordCalled(string: str):
@@ -36,8 +47,8 @@ def isStartWordCalled(string: str):
 
 #TODO: 아로나가 말하고 있을 때는 녹음이 되지 않도록 해야함.
 if __name__ == "__main__":
-    energy_threshold = 13000
-    record_timeout = 4
+    energy_threshold = 1000
+    record_timeout = 2
     phrase_timeout = 3
     
     phrase_time = None
@@ -49,12 +60,11 @@ if __name__ == "__main__":
     
     source = sr.Microphone(sample_rate=16000)
     audio_model = WhisperModel(
-        model_size_or_path='large-v2', # large-v2
+        model_size_or_path='small', # large-v2
         device='cuda',
         compute_type='float16',
     )
-    tts_arona("。シッディムの箱。稼動します。")
-
+    tts_arona("シッディムの箱。稼動します。", False)
     temp_file = NamedTemporaryFile().name
     transcription = ['']
     
@@ -114,13 +124,14 @@ if __name__ == "__main__":
                 
                 if text != '':
                     if isCalledArona: # if True 로 바꾸고 if isStartWordCalled 부분 주석처리하면 그냥 아로나와 대화하는 것. 
-                        msg = LLM(transcription[-1])
                         
+                        msg = text
                         # if language != 'ja':
-                        msg = p.translate(msg, 'ja')
-                            
+                        #     msg = p.translate(transcription[-1], 'ja')
+
+                        msg = LLM(msg)
                         print(msg)
-                        tts_arona(msg)
+                        tts_arona(msg, language=='ko')
                         print("아로나가 대답을 완료했어요!")
                         sleep(0.5)
                         isCalledArona = False

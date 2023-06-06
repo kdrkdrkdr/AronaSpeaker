@@ -26,7 +26,7 @@ def AnswerChatGPT(user_input):
 
     message_log.append({"role": "assistant", "content": resp})
     print(f"AI assistant: {resp}")
-    return resp
+    return resp.replace('あなた', '先生')
 
 
 
