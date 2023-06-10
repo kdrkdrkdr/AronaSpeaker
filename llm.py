@@ -3,7 +3,7 @@ import time
 import requests
 
 import openai
-openai.api_key = "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"
+openai.api_key = "YOUR_API_KEY"
 
 
 def AnswerChatGPT(user_input):
@@ -32,7 +32,7 @@ def AnswerChatGPT(user_input):
 
 
 from bardapi import Bard
-os.environ['_BARD_API_KEY']="XAh-D03kAQUyBOsLtPQKL8AovqSUx3yRPyGio0S1xEbfFFJHTP3164Q5ZaeD--LQCDpJKQ."
+os.environ['_BARD_API_KEY']="YOUR_API_KEY"
 
 
 
