@@ -1,6 +1,5 @@
 # AronaSpeaker
-{% include video id="vVW_IA-mQ8Y" provider="youtube" %}
-
+<iframe width="956" height="538" src="https://www.youtube.com/embed/vVW_IA-mQ8Y" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <!--
 싯딤의 상자입니다^^
 
